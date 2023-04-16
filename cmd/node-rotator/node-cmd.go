@@ -19,9 +19,6 @@ type rotateOptions struct {
 	waitBetweenDrains    uint
 }
 
-var (
-	whatamidoing string
-)
 
 func newRotateCmd() *cobra.Command {
 	o := rotateOptions{}
@@ -54,6 +51,17 @@ func newRotateCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&whatamidoing, "wamid", "yourname", "testing")
+	cmd.Flags().StringVar(&o.cluster, "cluster", "", "The name of the cluster to be upgraded.")
+	cmd.Flags().UintVar(&o.maxScaling, "max-scaling", 5, "The maximum number of nodes to rotate every time. If the number is bigger than the number of nodes, then the number of nodes will be the maximum number.")
+	cmd.Flags().BoolVar(&o.rotateMasters, "rotate-masters", false, "if disabled, master nodes will not be rotated")
+	cmd.Flags().BoolVar(&o.rotateWorkers, "rotate-workers", true, "if disabled, worker nodes will not be rotated")
+	cmd.Flags().UintVar(&o.maxDrainRetries, "max-drain-retries", 10, "The number of times to retry a node drain.")
+	cmd.Flags().UintVar(&o.evictGracePeriod, "evict-grace-period", 600, "The pod eviction grace period when draining in seconds.")
+	cmd.Flags().UintVar(&o.waitBetweenRotations, "wait-between-rotations", 60, "Τhe time to wait between each rotation of a group of nodes.")
+	cmd.Flags().UintVar(&o.waitBetweenDrains, "wait-between-drains", 60, "The time to wait between each node drain in a group of nodes.")
+	if err := cmd.MarkFlagRequired("cluster"); err != nil {
+		return nil
+	}
+
 	return cmd
 }

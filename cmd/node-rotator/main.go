@@ -1,10 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"os"
 
-	"github.com/spf13/cobra"
 	logger "github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 )
 
 func main() {
@@ -13,6 +14,12 @@ func main() {
 		logger.WithError(err).Error("command failed")
 		os.Exit(1)
 	}
+}
+
+func printJSON(data interface{}) error {
+	encoder := json.NewEncoder(os.Stdout)
+	encoder.SetIndent("", "    ")
+	return encoder.Encode(data)
 }
 
 func newRootCmd() *cobra.Command {
